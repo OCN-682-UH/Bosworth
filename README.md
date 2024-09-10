@@ -14,10 +14,6 @@
 > 3. Editing a README file using MARKDOWN
 
 > 4. PullAddCommitPush to Git: _Weight Data_
-  
-    > High sample treatment produced lower weights **less than 5**.
-  
-    > Low sample treatment produced weights **less than 10** but **greater than 5**.
 
 #### week03
 
