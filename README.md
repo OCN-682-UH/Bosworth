@@ -3,7 +3,7 @@
 ## Repository contents
 * MBIO 612 practice scripts
 * MBIO 612 HW assignments: _weekXX_
-* MBIO 612 _weekXX_ description
+> * MBIO 612 _weekXX_ highlights
 
 #### week02
 
@@ -20,3 +20,5 @@
     > Low sample treatment produced weights **less than 10** but **greater than 5**.
 
 #### week03
+
+> 1. 
