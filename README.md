@@ -1,7 +1,6 @@
 # Bosworth
 
 ## Repository contents
-* MBIO 612 scripts
 * MBIO 612 HW assignments: _weekXX_
 > * MBIO 612 _weekXX_ highlights
 
