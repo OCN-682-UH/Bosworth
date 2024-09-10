@@ -1,20 +1,20 @@
 # Bosworth
 
-## Repository contents
+## Repository contents ##
 * MBIO 612 practice scripts
 * MBIO 612 HW assignments: _weekXX_
 * MBIO 612 _weekXX_ description
 
-#### week02
+#### week02 ####
 
-Cloning repos
+##### Cloning repos #####
 
-Workflow structure/organization
+> 1. Workflow structure/organization
 
-Editing a README file using MARKDOWN
+> 2. Editing a README file using MARKDOWN
 
-PullAddCommitPush to Git: _Weight Data_
+> 3. PullAddCommitPush to Git: _Weight Data_
   
-  > High sample treatment produced lower weights **less than 5**.
+    > High sample treatment produced lower weights **less than 5**.
   
-  > Low sample treatment produced weights **less than 10** but **greater than 5**.
+    > Low sample treatment produced weights **less than 10** but **greater than 5**.
