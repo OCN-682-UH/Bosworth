@@ -1,14 +1,20 @@
 # Bosworth
 
-## MBIO612 week2 ##
+## Repository contents
+* MBIO 612 practice scripts
+* MBIO 612 HW assignments: _weekXX_
+* MBIO 612 _weekXX_ description
 
-### My first README file in Git: _Weight Data_
+#### week02
 
-#### Created by: Kyle Bosworth
+Cloning repos
 
-#### Created on: 2024-09-10
+Workflow structure/organization
 
-> High sample treatment produced lower weights **less than 5**.
+Editing a README file using MARKDOWN
 
-
-> Low sample treatment produced weights **less than 10** but **greater than 5**.
+PullAddCommitPush to Git: _Weight Data_
+  
+  > High sample treatment produced lower weights **less than 5**.
+  
+  > Low sample treatment produced weights **less than 10** but **greater than 5**.
