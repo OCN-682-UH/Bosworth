@@ -1,4 +1,4 @@
-# My first plot
+# My first plot 
 # 2024-09-10
 
 # load libraries
