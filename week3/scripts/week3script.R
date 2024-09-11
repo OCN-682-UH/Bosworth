@@ -15,7 +15,7 @@ glimpse(penguins)
 ggplot(data = penguins,
        mapping = aes(x = bill_depth_mm, ## "," are used to add on layers
                      y = bill_length_mm,
-                     geom_point(size = 2, alpha = 0.5), # manipulating the size of points
+                     geom_point(size = 2, alpha = 0.5), # manipulating the size of points 2 and 0.5
                      color = species,
                      shape = species, # shape is discrete
                      size = body_mass_g, # size is continuous 
@@ -33,3 +33,4 @@ ggplot(data = penguins,
        shape = "Species!",
        caption = "source: Palmer Penguins package/palmer LTER") +
   scale_color_viridis_d()
+
