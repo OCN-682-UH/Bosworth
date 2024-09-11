@@ -33,6 +33,3 @@ ggplot(data = penguins,
        shape = "Species!",
        caption = "source: Palmer Penguins package/palmer LTER") +
   scale_color_viridis_d()
-  
-
-       
