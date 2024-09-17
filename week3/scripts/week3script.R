@@ -2,10 +2,11 @@
 # Created by Kyle Bosworth
 # 2024-09-10
 #Week3
-
+## here() starts at C:/Users/boz/Desktop/Repositories/Bosworth
 # load libraries
 library(tidyverse)
 library(palmerpenguins)
+library(here)
 
 # looking at the data 
 view(penguins)
@@ -15,11 +16,11 @@ glimpse(penguins)
 
 # make a plot
 ggplot(data = penguins,
-       mapping = aes(x = bill_depth_mm, ## "," are used to add on layers
+       mapping = aes(x = bill_depth_mm, ## aes = aesthetics, ## "," are used to add on layers
                      y = bill_length_mm,
                      color = island,
-                     shape = island)) + # shape is discrete # size is continuous ## "+" is used to connect functions 
-  geom_point(size = 1, alpha = 0.5) +  # manipulating the size of point
+                     shape = island)) + # shape is discrete, # size is continuous ## "+" is used to connect functions 
+  geom_point(size = 1, alpha = 0.5) + # geom_xx = geometry, # manipulating the size of point
   geom_violin() + 
   facet_wrap(island ~ species, ncol = 2) +  
 # X as a function of Y = (x~y)
@@ -37,3 +38,4 @@ ggplot(data = penguins,
   theme(legend.position = "bottom",  # legend. position to move legend to bottom
         plot.title = element_text(hjust = 0.5),  # plot title center
         plot.subtitle = element_text(hjust = 0.5))  # plot subtitle center
+ggsave(here("week3","outputs", "week3plot.png"))
