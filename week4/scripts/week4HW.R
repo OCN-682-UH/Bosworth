@@ -37,30 +37,28 @@ penguins_clean_female <- penguins %>%
   mutate(log_body_mass = log(body_mass_g)) %>%
   select(species, island, sex, log_body_mass)
 # create the plot!
-point_plot<-ggplot(penguins_clean_female, aes(x = species, y = log_body_mass, color = island)) +
-  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.7) +  # Jittered points for individual data
-  labs(
-    title = "Log Body Mass of Female Penguins",
-    subtitle = "By Species and Island",
-    x = "Species",
-    y = "Log Body Mass",
-    color = "Island"
-  ) +
-  scale_color_brewer(palette = "Set2") +  # Color palette for islands
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
-    legend.position = "bottom",  # Position the legend at the bottom
-    plot.title = element_text(hjust = 0.5),  # Center the title
-    plot.subtitle = element_text(hjust = 0.5))  # Center the subtitle
+penguinplot1<-ggplot(data=penguins_clean_female,
+                     mapping = aes(x = species, 
+                                   y = log_body_mass, 
+                                   color = island)) +
+                     geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.7) +  # Jittered points for individual data
+  geom_point()+
+  geom_smooth(method = "lm") +
+    labs(title = "Log Body Mass of Female Penguins",
+         subtitle = "By Species and Island",
+         x = "Species",
+         y = "Log Body Mass",
+         color = "Island") +
+    scale_color_brewer(palette = "Set2") +  # Color palette for islands
+    theme_minimal() + theme(
+      axis.text.x = element_text(angle = 45, 
+                                 hjust = 1),  # Rotate x-axis labels for better readability
+      legend.position = "bottom",  # Position the legend at the bottom
+      plot.title = element_text(hjust = 0.5),  # Center the title
+      plot.subtitle = element_text(hjust = 0.5))  # Center the subtitle
 #save to outputs folder!
 
-if (!dir.exists(here("week4", "outputs"))) {
-  dir.create(here("week4", "outputs"), recursive = TRUE)}
-#save
-ggsave(filename = here("week4", "outputs", "female_penguins.png"), 
+ggsave(filename = here("outputs","female_penguins.png"), 
        plot = point_plot, 
-       width = 10, 
-       height = 6)
-# Print confirmation message
-cat("Plot saved as", here("week4", "outputs", "female_penguins.png"), "\n")
+       width = 10, height = 6)
+
