@@ -62,4 +62,72 @@ penguins %>%
   geom_boxplot()
 
 
+## Week4b tidyr package HW
+## created by: Kyle Bosworth
+## 09/24/24
+## here() starts at C:/Users/boz/Desktop/Repositories/Bosworth
+## load libraries
+library(tidyverse)
+library(here)
+library(ggplot2)
+
+# load in data
+chem_data <- read_csv(here("data", "chemicaldata_maunalua.csv"))
+data_dict <- read_csv(here("data", "chem_data_dictionary.csv"))
+
+# analysis (looking at the data)
+view(chem_data)
+head(chem_data)
+tail(chem_data)
+glimpse(chem_data)
+
+view(data_dict)
+head(data_dict)
+tail(data_dict)
+glimpse(data_dict)
+
+# remove all of NAs
+chem_data_clean<-chem_data %>%
+  filter(complete.cases(.)) #filters out everything that is not a complete row
+View(chem_data_clean)
+
+# separate the Tide_time column
+chem_data_clean <- chem_data %>%
+  drop_na() %>%
+  separate(col = Tide_time, 
+           into = c("Tide","Time"), 
+           sep = "_",
+           remove = FALSE) %>%
+  pivot_longer(cols = Temp_in:percent_sgd,
+               names_to = "Variables",
+               values_to = "Values")
+group_by(Variables, Site, Time) %>%
+  summarise(mean_vals = mean(Values, na.rm = TRUE))
+pivot_wider(names_from = Variables, 
+            values_from = mean_vals) %>% # notice it is now mean_vals as the col name
+  write_csv(here("Week_04","output","summary.csv"))  # export as a csv to the right folder
+head(chem_data_clean)
+
+chem_data_long <- chem_data_clean %>%
+  pivot_longer(cols = Temp_in:percent_sgd,
+               names_to = "Variables",
+               values_to = "Values")
+
+view(chem_data_long)
+chem_data_long %>%
+  group_by(Variables, Site) %>% # group by everything we want
+  summarise(Param_means = mean(Values, na.rm = TRUE), # get mean
+            Param_vars = var(Values, na.rm = TRUE)) # get variance
+## summarise() has grouped output by 'Variables'. You can override using the
+## .groups argument.
+
+
+### convert data that is in long format to wide format
+chem_data_wide<-chem_data_long %>%
+  pivot_wider(names_from = Variables,
+              values_from = Values)
+view(chem_data_wide)
+
+
+
 

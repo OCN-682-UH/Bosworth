@@ -11,45 +11,45 @@ library(ggplot2)
 chem_data <- read_csv(here("data", "chemicaldata_maunalua.csv"))
 data_dict <- read_csv(here("data", "chem_data_dictionary.csv"))
 
+# analysis (looking at the data)
+view(chem_data)
+head(chem_data)
+tail(chem_data)
+glimpse(chem_data)
+
+view(data_dict)
+head(data_dict)
+tail(data_dict)
+glimpse(data_dict)
+
 # remove all of NAs
-chem_data_clean <- chem_data %>% drop_na()
+chem_data_clean<-chem_data %>%
+  filter(complete.cases(.)) #filters out everything that is not a complete row
+View(chem_data_clean)
 
-# separate the Tide_time column
-chem_data_clean <- chem_data_clean %>%
-  separate(Tide_time, into = c("Tide", "Time"), sep = " ")
-
-# convert Time to hms
-chem_data_clean <- chem_data_clean %>%
-  mutate(Time = hms(Time))
+# separate tide_time column
+chem_data_clean <- chem_data %>%
+  drop_na() %>%
+  separate(col = Tide_time, 
+           into = c("Tide","Time"), 
+           sep = "_",
+           remove = FALSE)
 
 # filter a subset of data, subset=wailupe
 chem_data_filtered <- chem_data_clean %>%
-  filter(Site == "Wailupe")
+  filter(Site == "W")
 
-# pivot is wider to create separate columns for each nutrients
-chem_data_wide <- chem_data_filtered %>%
-  pivot_wider(names_from = Nutrient, values_from = Value)
+view(chem_data_filtered)
 
-# calculate my summary statistics!
-summary_stats <- chem_data_wide %>%
-  group_by(Site, Season) %>%
-  summarise(across(c(NH4, NO3.NO2, PO4, SiO4), 
-                   list(mean = mean, sd = sd), 
-                   .names = "{.col}_{.fn}"))
+#pivot longer
+chem_data_long <- chem_data_filtered %>%
+  pivot_longer(cols = Temp_in:percent_sgd,
+               names_to = "Variables",
+               values_to = "Values") %>%
+group_by(Zone, Variables, Values) %>%
+  summarise(mean_vals = mean(Values, na.rm = TRUE)) %>%
+  pivot_wider(names_from = Zone,
+              values_from = mean_vals) %>%
+# save as csv
+write_csv(here("outputs","HWbsummary.csv"))  # export as a csv to the right folder
 
-# export summary statistics into CSV
-write_csv(summary_stats, here("output", "chemistry_summary_stats.csv"))
-
-# create a plot! =scatterplot of NO3.NO2 vs PO4, colored by seasons
-nutrient_plot <- ggplot(chem_data_wide, aes(x = NO3.NO2, y = PO4, color = Season)) +
-  geom_point() +
-  labs(title = "NO3.NO2 vs PO4 in Wailupe",
-       x = "NO3.NO2 (µmol/L)",
-       y = "PO4 (µmol/L)") +
-  theme_minimal()
-
-# Display the plot
-nutrient_plot
-
-# save
-ggsave(here("week4", "output", "nutrient_scatter_plot.png"), plot = nutrient_plot, width = 8, height = 6)
