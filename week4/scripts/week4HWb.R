@@ -52,4 +52,16 @@ group_by(Zone, Variables, Values) %>%
               values_from = mean_vals) %>%
 # save as csv
 write_csv(here("outputs","HWbsummary.csv"))  # export as a csv to the right folder
-
+view(chem_data_filtered)
+#make a plot!
+salNNplot <- ggplot(chem_data_filtered, 
+                  aes(x = NO3.NO2, 
+                      y = Salinity, 
+                      color = Season)) +
+  geom_point() +
+  labs(title = "NO3.NO2 vs Salinity in Wailupe",
+       x = "NO3.NO2 (µmol/L)",
+       y = "Salinity (PSU)") +
+  theme_minimal()
+# save
+ggsave(here("outputs", "SALNN_plot.png"), plot = salNNplot, width = 8, height = 6)
