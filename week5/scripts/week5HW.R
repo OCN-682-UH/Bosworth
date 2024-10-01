@@ -64,3 +64,4 @@ ggplot(averaged_data, aes(x = minute)) +
                                 color = "Measurement") +
   theme_minimal() +
   theme(legend.position = "bottom")
+ggsave(here("week5","outputs","PLOTtempsaldepthovertime.png"))
