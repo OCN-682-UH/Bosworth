@@ -1,0 +1,87 @@
+---
+title: "week6classworka"
+author: "Kyle Bosworth"
+date: "2024-10-01"
+output: 
+  html_document:
+    toc: TRUE
+    TOC_float: TRUE
+    theme: darkly
+---
+
+<!-- This line is commented, wonʻt show in the document -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+# Intro to Penguins
+Using Penguin data to learn *RMarkdown*
+
+# Load Libraries
+```{r}
+library(palmerpenguins)
+library(tidyverse)
+library(here)
+library(ggplot2)
+install.packages("kableExtra")
+library(kableExtra)
+```
+
+# Inspect the data
+```{r}
+glimpse(penguins)
+```
+
+# Make a plot
+<!-- Working with figures
+We can change lots of aspects of the figure right in our markdown document:
+change size
+change resolution
+change "device" (i.e. is it a .png. .pdf, etc.)
+save it in a specific folder -->
+
+```{r}
+library(ggplot2)
+library(palmerpenguins)
+penguins %>%
+  ggplot(aes(x = species,
+             y = flipper_length_mm,
+             fill = species)) +
+  geom_boxplot() +
+  labs(x = "Species of Penguin",
+       y = "Penguin flipper length (mm)") +
+  theme_bw()
+```
+
+<!-- Save your figure in rmarkdown
+You CAN still use ggsave, but there are also more automated ways to export your figures in rmarkdown
+
+Set the file path for your figure using:
+  fig.path (you can put this in a global option to send all your figures there)
+  name your code chunk (this will be the name of the figure)
+
+Place between curly braces -- label is the name of your output (plot, table, code chunk, etc.)
+{r label}
+
+Separated options with commas
+{r label, option1=value} -->
+
+# Making a table
+```{r}
+penguins%>%
+  group_by(species) %>%
+  summarise(billmean = mean(bill_length_mm, na.rm = TRUE)) %>%
+  kbl() %>% #make it a kable table
+  kable_classic()%>%
+  row_spec(2, bold = T, color = "white", background = "red") %>%
+  kable_styling(full_width = FALSE)
+```
+
+
+
+
+
+
