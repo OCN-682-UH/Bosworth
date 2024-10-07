@@ -6,6 +6,90 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
 ```
+
+# Load libraries
+```{r}
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(kableExtra)
+```
+
+# Load and clean up data
+```{r}
+maunaluaSGD<-read.csv(here("week6","data","chemicaldata_maunalua.csv"))
+maunaluaSGD<-maunaluaSGD %>%
+  drop_na(percent_sgd, Salinity, Zone, Season)
+
+# organizing the zones from nearest to farthest from shore by creating a factor for the zone ordering
+zone_order<-c("Near Spring","Channel","Diffuse","Transition","Ambient","Offshore")
+maunaluaSGD$Zone<-factor(maunaluaSGD$Zone,levels = zone_order)
+```
+
+# Inspect the data
+```{r}
+glimpse(maunaluaSGD)
+View(maunaluaSGD)
+```
+
+# How does Salinity and percent_SGD change over different zones and by season?
+
+## Figure 1. Salinity and percent_SGD by zone during Fall
+```{r}
+ggplot(maunaluaSGD,
+       aes(x = Zone)) + 
+  geom_point(aes(y = percent_sgd,
+                 color = "Percent SGD"), size = 3) +
+  geom_line(aes(y = percent_sgd,
+                group = 1,
+                color = "Percent SGD")) +
+  geom_point(aes(y = Salinity,
+                 color = "Salinity"), size = 3) +
+  geom_line(aes(y = Salinity,
+                group = 1,
+                color = "Salinity")) +
+  facet_wrap(~ Season, scales = "free_y", ncol = 1) +
+  scale_color_manual(values = c("Percent SGD" = "blue",
+                                "Salinity" = "red")) +
+    labs(title = "Percent SGD and Salinity by Zone and Season",
+         x = "Zone",
+         y = "Value",
+         color = "Measure") +
+    theme_minimal() + 
+    theme(axis.text = element_text(angle = 45, hjust = 1),
+          legend.position = "bottom")
+```
+
+## Table 1. Salinity and sgd Fall
+```{r}
+fall_table<-maunaluaSGD %>%
+  filter(Season == "FALL") %>%
+  group_by(Zone) %>% 
+  summarise(
+    mean_salinity = mean(Salinity),
+    mean_percent_sgd = mean(percent_sgd)) %>%
+  arrange(factor(Zone, levels = zone_order))
+
+kable(fall_table, caption = "Table 1. Mean Salinity by Zone (Fall)") %>%
+  kable_styling()
+```
+
+## Table 2. Salinity and SGD spring
+```{r}
+spring_table<-maunaluaSGD %>%
+  filter(Season == "SPRING") %>%
+  group_by(Zone) %>%
+  summarise(
+    mean_salinity = mean(Salinity),
+    mean_percent_sgd = mean(percent_sgd)) %>%
+  arrange(factor(Zone, levels = zone_order))
+
+kable(fall_table, caption = "Table 2. Mean Salinity and SGD by Zone (SPRING)") %>%
+  kable_styling()
+```
+
 

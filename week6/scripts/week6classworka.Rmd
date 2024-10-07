@@ -26,7 +26,6 @@ library(palmerpenguins)
 library(tidyverse)
 library(here)
 library(ggplot2)
-install.packages("kableExtra")
 library(kableExtra)
 ```
 
