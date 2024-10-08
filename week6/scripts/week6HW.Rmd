@@ -2,69 +2,79 @@
 title: "week6HW"
 author: "Kyle Bosworth"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: darkly
+
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
-                      warning = FALSE)
+                      warning = FALSE,
+                      fig.width = 10, 
+                      fig.height = 6, 
+                      out.width = "100%", 
+                      fig.retina = 3,
+                      fig.align = "center")
 ```
 
-# Load libraries
+### Load libraries
 ```{r}
 library(tidyverse)
 library(here)
 library(ggplot2)
 library(kableExtra)
+library(prettydoc)
 ```
 
-# Load and clean up data
+### Load and clean up data
 ```{r}
 maunaluaSGD<-read.csv(here("week6","data","chemicaldata_maunalua.csv"))
-maunaluaSGD<-maunaluaSGD %>%
-  drop_na(percent_sgd, Salinity, Zone, Season)
-
-# organizing the zones from nearest to farthest from shore by creating a factor for the zone ordering
-zone_order<-c("Near Spring","Channel","Diffuse","Transition","Ambient","Offshore")
-maunaluaSGD$Zone<-factor(maunaluaSGD$Zone,levels = zone_order)
+#Define the zones in order
+zone_order<- c("Near Spring","Channel","Diffuse","Transition","Ambient","Offshore")
+#create as factor
+maunaluaSGD <- maunaluaSGD %>%
+  drop_na(percent_sgd, Salinity, Zone, Season) %>%
+  mutate(Zone = factor(Zone, levels = zone_order))
 ```
 
-# Inspect the data
+### Inspect the data
 ```{r}
 glimpse(maunaluaSGD)
-View(maunaluaSGD)
 ```
 
-# How does Salinity and percent_SGD change over different zones and by season?
+### _What is the relationship between percent Submarine Groud Water Discharge (SGD) and salinity across different coastal zones, and how does this relationship vary by season?_
 
-## Figure 1. Salinity and percent_SGD by zone during Fall
+### Figure 1. Relationship between Percent SGD and Salinity Across Coastal Zones in Fall and Spring
 ```{r}
 ggplot(maunaluaSGD,
-       aes(x = Zone)) + 
-  geom_point(aes(y = percent_sgd,
-                 color = "Percent SGD"), size = 3) +
-  geom_line(aes(y = percent_sgd,
-                group = 1,
-                color = "Percent SGD")) +
-  geom_point(aes(y = Salinity,
-                 color = "Salinity"), size = 3) +
-  geom_line(aes(y = Salinity,
-                group = 1,
-                color = "Salinity")) +
-  facet_wrap(~ Season, scales = "free_y", ncol = 1) +
-  scale_color_manual(values = c("Percent SGD" = "blue",
-                                "Salinity" = "red")) +
-    labs(title = "Percent SGD and Salinity by Zone and Season",
-         x = "Zone",
-         y = "Value",
-         color = "Measure") +
-    theme_minimal() + 
-    theme(axis.text = element_text(angle = 45, hjust = 1),
-          legend.position = "bottom")
+       aes(x = percent_sgd,
+           y = Salinity,
+           color = Zone,
+           shape = Season)) + 
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, 
+              aes(group = 1, 
+                  color = "black", 
+                  linetype = "dashed")) +
+  scale_color_viridis_d() +
+    facet_wrap(~ Season, scales = "free") +
+    labs(title = "Percent SGD and Salinity",
+         subtitle = "[Accross different zones and seasons in Maunalua Bay]",
+         x = "Percent SGD",
+         y = "Salinity (ppt)",
+         color = "Zone",
+         Shape = "Season") +
+    theme_minimal() +
+    theme(legend.position = "right",
+          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5, face = "italic"))
 ```
 
-## Table 1. Salinity and sgd Fall
+### Table 1. Mean Salinity and SGD (Fall)
 ```{r}
 fall_table<-maunaluaSGD %>%
   filter(Season == "FALL") %>%
@@ -75,10 +85,12 @@ fall_table<-maunaluaSGD %>%
   arrange(factor(Zone, levels = zone_order))
 
 kable(fall_table, caption = "Table 1. Mean Salinity by Zone (Fall)") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = c("striped",
+                                      "hover",
+                                      "condensed"), full_width = F)
 ```
 
-## Table 2. Salinity and SGD spring
+### Table 2. Mean Salinity and SGD (SPRING)
 ```{r}
 spring_table<-maunaluaSGD %>%
   filter(Season == "SPRING") %>%
@@ -89,7 +101,9 @@ spring_table<-maunaluaSGD %>%
   arrange(factor(Zone, levels = zone_order))
 
 kable(fall_table, caption = "Table 2. Mean Salinity and SGD by Zone (SPRING)") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = c("striped", 
+                                      "hover", 
+                                      "condensed"), full_width = F)
 ```
 
 
