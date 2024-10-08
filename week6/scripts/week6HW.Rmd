@@ -7,7 +7,6 @@ output:
     toc: true
     toc_float: true
     css: snazzy.css
-
 ---
 
 ```{r setup, include=FALSE}
@@ -19,6 +18,11 @@ knitr::opts_chunk$set(echo = TRUE,
                       out.width = "100%", 
                       fig.retina = 3,
                       fig.align = "center")
+
+output_dir <- here::here("outputs")
+if (!dir.exists(output_dir)) dir.create(output_dir)
+
+
 ```
 
 ### Load libraries
