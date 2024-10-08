@@ -2,7 +2,9 @@
 title: "week6HW"
 author: "Kyle Bosworth"
 date: "`r Sys.Date()`"
-output: 
+output:
+  pdf_document:
+    toc: true
   html_document:
     toc: true
     toc_float: true
@@ -18,10 +20,6 @@ knitr::opts_chunk$set(echo = TRUE,
                       out.width = "100%", 
                       fig.retina = 3,
                       fig.align = "center")
-
-output_dir <- here::here("outputs")
-if (!dir.exists(output_dir)) dir.create(output_dir)
-
 
 ```
 
