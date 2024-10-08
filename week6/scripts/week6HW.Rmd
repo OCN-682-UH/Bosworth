@@ -6,7 +6,7 @@ output:
   html_document:
     toc: true
     toc_float: true
-    theme: darkly
+    css: snazzy.css
 
 ---
 
