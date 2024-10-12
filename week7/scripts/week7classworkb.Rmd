@@ -33,6 +33,10 @@ library(prettydoc)
 library(ggspatial)
 library(data.table)
 library(ggmap)
+
+
+
+
 ```
 
 ### Read in data
@@ -47,16 +51,11 @@ glimpse(ChemData)
 
 #location as a string:
 Oahu<-get_map("oahu")
-#API code: AIzaSyDFEiZfRlGQ6VKco6XljqHYg1iuHZBSm3c
-#stadi maps api code: 7d632143-15b1-4847-925d-04842047a2e9
 
 
-ggmap::register_google(key = "AIzaSyDFEiZfRlGQ6VKco6XljqHYg1iuHZBSm3c")
-register_stadiamaps("7d632143-15b1-4847-925d-04842047a2e9", write = TRUE)
 ```
 ```{r}
-if(!requireNamespace("devtools")) install.packages("devtools")
-devtools::install_github("dkahle/ggmap", ref = "tidyup", force=TRUE)
+
 1```
 
 
