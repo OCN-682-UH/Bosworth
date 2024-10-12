@@ -1,0 +1,63 @@
+---
+title: "week7HW"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fi.path = "../outputs/")
+```
+
+### Load libraries
+```{r}
+library(tidyverse)
+library(here)
+library(maps)
+# maps The {maps} package is a combination of functions that pair well with ggplot and base layers for maps (i.e. polygons of regions of interest).
+
+## map_data("location") is the function used to pull out whatever base layer that you want.
+
+library(mapdata)
+library(mapproj)
+library(kableExtra)
+library(prettydoc)
+library(ggspatial)
+library(data.table)
+library(ggmap)
+```
+
+### Read in data
+```{r}
+ChemData<-read.csv(here("week7","data","chemicaldata_maunalua.csv"))
+glimpse(ChemData)
+```
+
+### Get basemaps from ggmap
+```{r}
+# get_map() is the function to get a basemap from google maps.
+
+#location as a string:
+Oahu<-get_map("oahu")
+#API code: AIzaSyDFEiZfRlGQ6VKco6XljqHYg1iuHZBSm3c
+#stadi maps api code: 7d632143-15b1-4847-925d-04842047a2e9
+
+
+ggmap::register_google(key = "AIzaSyDFEiZfRlGQ6VKco6XljqHYg1iuHZBSm3c")
+register_stadiamaps("7d632143-15b1-4847-925d-04842047a2e9", write = TRUE)
+```
+```{r}
+if(!requireNamespace("devtools")) install.packages("devtools")
+devtools::install_github("dkahle/ggmap", ref = "tidyup", force=TRUE)
+1```
+
+
+
