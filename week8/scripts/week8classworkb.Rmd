@@ -1,0 +1,29 @@
+---
+title: "week8classworkb"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fi.path = "../outputs/")
+ggmap::register_google(key = "AIzaSyDFEiZfRlGQ6VKco6XljqHYg1iuHZBSm3c")
+register_stadiamaps ("7d632143-15b1-4847-925d-04842047a2e9", write = TRUE)
+```
+
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+
+```
+

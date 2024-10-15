@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       out.width = "100%", 
                       fig.retina = 3,
                       fig.align = "center",
-                      fi.path = "../outputs/")
+                      fig.path = here::here("Bosworth","week7", "outputs", "/"))
 ```
 
 ### Load libraries
