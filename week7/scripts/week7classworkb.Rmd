@@ -1,5 +1,5 @@
 ---
-title: "week7HW"
+title: "week7classworkb"
 author: "Kyle Bosworth"
 date: "`r Sys.Date()`"
 output:
@@ -14,6 +14,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
                       warning = FALSE,
+                      fig.width = 10, 
+                      fig.height = 6, 
+                      out.width = "100%", 
+                      fig.retina = 3,
+                      fig.align = "center",
                       fi.path = "../outputs/")
 ```
 
@@ -35,7 +40,8 @@ library(data.table)
 library(ggmap)
 
 
-
+ggmap::register_google(key = "AIzaSyDFEiZfRlGQ6VKco6XljqHYg1iuHZBSm3c")
+register_stadiamaps("7d632143-15b1-4847-925d-04842047a2e9", write = TRUE)
 
 ```
 
@@ -52,11 +58,56 @@ glimpse(ChemData)
 #location as a string:
 Oahu<-get_map("oahu")
 
+ggmap(Oahu)
+
+#you can also pu in lat and long coordinates to get a basemap.
+## get coordinates for Wailupe on Oahu
+
+#make a data frame of lat and long coordinates
+WP<-data.frame(lon = -157.7621, lat = 21.27427)
+
+#grab base layer
+Map1<-get_map(WP)
+
+#plot it
+ggmap(Map1)
+
+#ZOOM, the zoom argument, an integer from 3 to 20 specifying how large the patial extent should be around the center, with 3 being the continent level and 20 being roughly the single building level. 
+Map1<-get_map(WP,zoom = 17)
+ggmap(Map1)
+
+#change the map type!
+Map1<-get_map(WP,
+              zoom = 17,
+              maptype = "satellite")
+ggmap(Map1)
+
+# You can use the ggmap base layer in any ggplot
+Map1<-get_map(WP,zoom = 17,maptype = "satellite")
+ggmap(Map1)+
+  geom_point(data = ChemData,
+             aes(x = Long,
+                 y = Lat,
+                 color = Salinity),
+             size = 4) +
+  scale_color_viridis_c()
+
+# Now letʻs ADD a Scale Bar
+Map1<-get_map(WP,zoom = 17,maptype = "satellite")
+ggmap(Map1)+
+  geom_point(data = ChemData, 
+             aes(x = Long, y = Lat, color = Salinity), 
+             size = 4) + 
+  scale_color_viridis_c()+
+  annotation_scale( bar_cols = c("yellow", "white"),
+                    location = "bl")+ # put the bar on the bottom left and make the colors yellow and white
+  annotation_north_arrow(location = "tl")+ # add a north arrow
+  coord_sf(crs = 4326) # for the scale bar to work it needs to be in this coordinate system - this is a typical coordinate reference system for a GPS (WGS84)
+
 
 ```
+Awsome r pach=kage
 ```{r}
-
-1```
-
-
+install.packages("emojifont")
+```
 
