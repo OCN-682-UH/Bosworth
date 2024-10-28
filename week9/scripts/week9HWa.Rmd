@@ -1,0 +1,152 @@
+---
+title: "week9HW - Old or fixed data set"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fi.path = "../outputs/")
+```
+
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggrepel)
+library(gganimate)
+library(magick)
+
+```
+
+Read in data: Mullet Guts Project
+```{r}
+mgp<-read.csv(here("week9","data","grainsize.csv"))
+glimpse(mgp)
+```
+
+Old data set: Total percent grain size will not equal %100
+Updated data set, Total grainsize % = 100
+
+Function 1. Check grain size % adds up to 100?
+```{r}
+
+check_grain_size_percent<- function(SiltClay, FineSand, MediumSand, CoarseSand, Gravel, TotalWeight) #arguments 
+{ # need to combine all percentages
+  percentages<- c(SiltClay, FineSand, MediumSand, CoarseSand, Gravel)
+  
+  # calculate sum using percentages
+  total<- sum(percentages, na.rm = TRUE)
+  
+  # checking if the sum is close to 100, allowing for a small rounding error
+   if (!any(is.na(percentages))) {
+    if (abs(total - 100) > 1) {
+      warning(paste("Total percentage is", total, "which is not close to 100. Check your data."))
+    }
+  } else {
+    warning("NA values present in the data.")
+  }
+  
+  # Now return the percentages as a data fram
+  data.frame(
+    SiltClay_percent = SiltClay,
+    FineSand_percent = FineSand,
+    MediumSand_percent = MediumSand,
+    CoarseSand_percent = CoarseSand,
+    Gravel_percent = Gravel,
+    Total = total
+  )
+}
+# adding new percentages and the total percent % columns
+# pmap is used to apply the checked_grain_size_percent function to each orw of the data frame
+
+mgp <- mgp %>%
+  mutate(checked_percentages = pmap(list(SiltClay, FineSand, MediumSand, CoarseSand, Gravel),
+                                    check_grain_size_percent))
+
+# Unnest the results to see the total % = 100?
+mgp <- mgp %>%
+  unnest(checked_percentages)
+
+glimpse(mgp)
+view(mgp)
+```
+There are some that do not add up to 100%, must be old data.
+
+Function 2 with plot: identify error rows and plot
+```{r}
+#function that identifies rows that don't sum to 100
+identify_not100 <- function(data, grain_columns, tolerance = 1) {
+  data %>%
+    #calculating the total of all grain size columns for each row
+    mutate(total = rowSums(select(., all_of(grain_columns)), na.rm = TRUE),
+           #need to create a logical column, TRUE if the total isnʻt in the tolerance of 100
+           isnot100 = abs(total - 100) > tolerance) %>%
+    #keeping only the rows where isnot100 is TURE
+    filter(isnot100)
+}
+
+#function to plot grain size distribution for a single sample
+plot_grain_size <- function(data, site_name_col, date_col, grain_columns) {
+  data_long <- data %>%
+    #reshape to long format 
+    #selecting only these columns
+    select(all_of(c(site_name_col, date_col, grain_columns))) %>%
+   
+    #convert grainsize columns into two, Grainsize ad Percentage
+     pivot_longer(cols = all_of(grain_columns),
+                 names_to = "GrainSize", 
+                 values_to = "Percentage")
+  #making ggplot 
+  ggplot(data_long, 
+         aes(x = GrainSize,#grainsize categories
+             y = Percentage, #percentage values
+             fill = GrainSize)) + #coor by grainsize cat.
+    
+    geom_bar(stat = "identity") + #add bars
+    geom_text(aes(label = round(Percentage, 1)), vjust = -0.5) + #add bar labels
+    theme_minimal() +
+    
+  #add titles/labels  
+    
+    labs(title = paste("Grain Size Distribution for Site", data[[site_name_col]], "on", data[[date_col]]),
+         
+         subtitle = paste("Total:", sum(data_long$Percentage, na.rm = TRUE), "%"),
+         x = "Grain Size", 
+         y = "Percentage") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) #rotate axis labels
+}
+
+# Specify your column names fr Grain sizes
+grain_columns <- c("SiltClay", "FineSand", "MediumSand", "CoarseSand", "Gravel")
+
+site_name_col <- "Site.Name"  #site identification column name
+
+date_col <- "Date"  #date column name
+
+
+# Identify samples that don't equal 100%
+non_100_samples <- identify_not100(mgp, grain_columns)
+
+# create a list of each plot, one is fo each not = 100% sample
+plot_list <- lapply(1:nrow(non_100_samples), function(i) {
+  plot_grain_size(non_100_samples[i,], site_name_col, date_col, grain_columns)
+})
+
+#display each of the plots in the list
+for (plot in plot_list) {
+  print(plot)
+}
+```
+
