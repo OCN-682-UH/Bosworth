@@ -14,9 +14,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
                       warning = FALSE,
-                      fi.path = "../outputs/")
+                      fig.path = "../outputs/")
 ```
-
 
 ### Load Libraries
 ```{r}
