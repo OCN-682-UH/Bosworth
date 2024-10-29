@@ -128,7 +128,7 @@ plot_grain_size <- function(data, site_name_col, date_col, grain_columns) {
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) #rotate axis labels
 }
 
-# Specify your column names fr Grain sizes
+# Specify column names fr Grain sizes
 grain_columns <- c("SiltClay", "FineSand", "MediumSand", "CoarseSand", "Gravel")
 
 site_name_col <- "Site.Name"  #site identification column name
