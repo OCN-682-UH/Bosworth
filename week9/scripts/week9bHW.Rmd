@@ -32,8 +32,75 @@ library(janitor)
 ### Read in data: 
 ```{r}
 intertidal<-read.csv(here("week9", "data", "intertidaldata.csv"))
+intertidaldictionary<-read.csv(here("week9", "data", "intertidal_data_dictionary.csv"))
+intertidallatitude<-read.csv(here("week9", "data", "intertidaldata_latitude.csv"))
 
-intertidal<-read.csv(here("week9", "data", "intertidaldata.csv"))
+glimpse(intertidal)
+view(intertidaldictionary)
+view(intertidallatitude)
+View(intertidal)
 
-glimpse()
-View()
+```
+
+
+### Merge data sets
+
+```{r}
+intertidal2 <- intertidal %>%
+  left_join(intertidallatitude, by = "Site") #joins latitude column into intertidal data set
+
+head(intertidal2)
+```
+### Figure 1. Algae count by site
+
+```{r}
+ggplot(data = intertidal2, aes(x = Site,
+                              y = Algae,
+                              color = Latitude)) +
+  geom_point(size = 3, alpha = .7) +
+  geom_jitter(width = 0.2, height = 0) +
+  theme_minimal()+
+  labs(title = "Algae Count by Site and Latitude",
+       x = "Site",
+       y = "Algae Count",
+       color = "Latitude") +
+  theme(axis.text.x = element_text(angle = 45, 
+                                     hjust = 1)) #angle adjust names at the bottom 
+```
+### Figure 2. Algae Count by Site and Latitude
+#### Factor = sties, redordering sites based on meadian algae count using fct_redorder2()
+
+```{r}
+ggplot(data = intertidal2, aes(x = fct_reorder(Site, Algae, .fun = median), #.fun = median is an argument from forcats package, calculates meadian
+                              y = Algae,
+                              color = Latitude)) +
+  geom_point(size = 3, alpha = .7) +
+  geom_jitter(width = 0.2, height = 0) +
+  theme_minimal()+
+  labs(title = "Meadian Algae Count by Site and Latitude",
+       x = "Site",
+       y = "Algae Count",
+       color = "Latitude") +
+  theme(axis.text.x = element_text(angle = 45, 
+                                     hjust = 1)) #angle adjust names at the bottom 
+```
+### Figure 3. Algae Counts by Site and Latituide Correlation
+#### Reordering sites based on the correlation between Latitude and Algae counts
+
+```{r}
+ggplot(data = intertidal2, aes(x = fct_reorder2(Site, Latitude, Algae, 
+
+.fun = function(lat, alg) cor(lat, alg)), #.fun = function is an argument from forcats package, I am using 2 variables: Latitude and Algae to reorder "Site". rearranges site based on how strongly correlated Lat and Alg are correlated at each site.
+                              y = Algae,
+                              color = Latitude)) +
+  geom_point(size = 3, alpha = .7) +
+  geom_jitter(width = 0.2, height = 0) +
+  theme_minimal()+
+  labs(title = "Algae Count by Site, Ordered by Latitude-Algae Correlation",
+      subtitle = "Sites ordered from strongest negative to strongest positive correlation",
+       x = "Site (ordered by Latitude-Algae correlation)",
+       y = "Algae Count",
+       color = "Latitude") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))#angle adjust names at the bottom 
+```
+
