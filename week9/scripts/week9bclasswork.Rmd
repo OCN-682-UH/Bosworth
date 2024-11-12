@@ -1,0 +1,174 @@
+---
+title: "week9bclasswork"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+
+
+```
+
+### Read in data: 
+```{r}
+#tuesdata <- tidytuesdayR::tt_load(2021, week = 7)
+#income_mean<-tuesdata$income_mean
+
+income_mean <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_mean.csv')
+
+```
+
+### What is a Factor?
+
+- A specialized version of a character
+- used to store categorical data
+- The values that a factor takes are called "levels"
+    - Default levels are always alphebetical
+
+```{r}
+# to make something a factor put the vector in the function facto()
+fruits<- factor(c("Apple", "Grape", "Banana"))
+fruits
+```
+### factor booby-traps!
+When can this be scary...
+
+Let's say you had a typo in a column of what was suppose to be numbers. R will read everything in as characters. If they are characters and you try to covert it to a number, the rows with real characters will covert to NAs
+
+```{r}
+test<-c("A", "1", "2")
+as.numeric(test)
+```
+
+NA is introduced, factors store everything as integers, factors should only be used used for categorical data, not numerical. 
+
+### {forcats}
+The forcats package is a family of functions for categorical data. All the main fuctions start with fct_
+
+Let's start with the starwars dataset to learn about how to use factors
+```{r}
+glimpse(starwars)
+```
+
+
+### starwars
+Let's look at some information by different species in the starwars films. How many individuals of each species are present across all starwars films?
+
+```{r}
+# filter out NAs by species
+
+starwars %>%
+  filter(!is.na(species)) %>% #count species and sort by TRUE to see how many unique species there are and how many characters there are
+  count(species)
+
+```
+There are 38 unique species, but most are really rare. Let's say we wanted to lump all the species together that had less than 3 individuals. We could use fct_lump() which converts the data into a factor and lumps it together
+
+```{r}
+star_counts<- starwars %>%
+  filter(!is.na(species)) %>%
+  mutate(species = fct_lump(species, n = 3)) %>% #groups species that occur less than 3 into a new category
+  count(species)
+```
+
+### reordering factors
+A basic ggplot
+```{r}
+star_counts %>%
+  ggplot(aes(x = fct_reorder(species, n, .desc = TRUE), y = n))+ # reorder the factor of species by n
+  geom_col() +
+  labs(x = "Species")
+```
+### Reordering line plots
+Let's say you wanted to make a line plot and reorder the legend to match the order of the lines. We will use the income_mean dataset to illustrate this.
+
+```{r}
+glimpse(income_mean)
+```
+How is income changing over time? We will make a plot of the total income by year and quantile across all dollar types.
+
+```{r}
+total_income<-income_mean %>%
+  group_by(year, income_quintile) %>%
+  summarise(income_dollars_sum = sum(income_dollars)) %>%
+  mutate(income_quintile = factor(income_quintile)) # make it a factor
+```
+Reordering Plots! With data that already exists
+Basic plot:
+```{r}
+total_income %>%
+ggplot(aes(x = year,
+             y = income_dollars_sum,
+             color = fct_reorder2(income_quintile, year, income_dollars_sum)))+ #reordered by incomequintile column, year, then sum
+  geom_line() +
+labs(color = "income quantile") 
+```
+
+Reordering levels directly in a vector just cause
+
+```{r}
+x1 <- factor(c("Jan", "Mar", "Apr","Dec "))
+x1
+
+x1 <- factor(c("Jan", "Mar", "Apr", "Dec"), levels = c("Jan", "Mar", "Apr", "Dec")) #within factor function you can specify the specific order that we want! factor, then levels of that factor
+x1
+```
+### Subset data with factors
+Back to starwars. Let's say we instead of grouping our species that have < 3 counts into "Other" we just filter them out.
+
+```{r}
+starwars_clean<-starwars %>% 
+  filter(!is.na(species)) %>% # remove the NAs
+  count(species, sort = TRUE) %>%
+  mutate(species = factor(species)) %>% #makes species into factor
+  filter(n>3) %>% #only keep species that have more than 3
+  droplevels() %>% # drop extra levels
+  mutate(species = fct_recode(species, "Humanoid" = "Human")) #recode/rename your factors by using fct recode, "new name" = "old name"
+  
+  
+  starwars_clean
+levels(starwars_clean)
+
+```
+Totally awsome R package: 
+Today's totally awesome R package
+{gm} (generate music)
+
+
+```{r}
+install.packages('gm')
+```
+
+Then follow directions from here to download the MuseScore program and tell R where the path to that program is.
+
+
+```{r}
+library(gm)
+m <- 
+  Music() +  # initialize a Music object
+  Meter(4, 4) + # add a 4/4 time signature
+  Line(c("C5", "D5", "E5", "F5")) # add a musical line of four quarter notes
+gm::show(m, to = c("score", "audio"))
+```
+
+

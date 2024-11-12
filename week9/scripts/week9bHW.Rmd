@@ -1,0 +1,39 @@
+---
+title: "week11bHW Factors"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(janitor)
+
+```
+
+### Read in data: 
+```{r}
+intertidal<-read.csv(here("week9", "data", "intertidaldata.csv"))
+
+intertidal<-read.csv(here("week9", "data", "intertidaldata.csv"))
+
+glimpse()
+View()
