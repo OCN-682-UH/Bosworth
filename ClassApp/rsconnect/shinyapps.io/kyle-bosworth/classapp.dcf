@@ -1,0 +1,12 @@
+name: classapp
+title: ClassApp
+username: kyle-bosworth
+account: kyle-bosworth
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13319974
+bundleId: 9353995
+url: https://kyle-bosworth.shinyapps.io/classapp/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,0 +1,122 @@
+---
+title: "Tidy Tuesday 2"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(leaflet)
+library(sf)
+library(rnaturalearth)
+library(htmlwidgets)
+
+```
+
+
+### Read in Data
+```{r}
+democracy_data <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-05/democracy_data.csv')
+
+
+# add in data: world map from rnaturalearth package
+worldmap <- ne_countries(scale = "small", returnclass = "sf") # ne_countries function returns world countires at a specified scale, scale sets the level of detail and "sf" is the specified format of the data (simple features).
+
+#making sure both columns are the same type of character before I join
+democracy_data$country_code <- as.character(democracy_data$country_code)
+worldmap$iso_a3 <- as.character(worldmap$iso_a3)
+
+# join the democracy data with the world map data
+mapdata_combined <- worldmap %>%
+  left_join(democracy_data, by = c("iso_a3" = "country_code")) %>%
+  filter(!is.na(regime_category)) #f filters outall rows where there is no match for thr regime_category tha I am after
+
+# color palette for the regime categories
+colpal <- colorFactor(
+  palette = c("red", "yellow", "blue", "green"),
+  domain = mapdata_combined$regime_category
+)
+```
+
+### Goal: To create a interactive scale map. Using the democracy_data from Tidytuesday
+
+```{r}
+# making the base map
+bm <- leaflet(mapdata_combined) %>%
+  addTiles() %>%
+  setView(lng = 0,
+           lat = 30,
+           zoom = 2)
+
+bm <- bm %>%
+  addControl(
+    html = '<h3 style="text-align: center;">Global Democracy Index</h3>
+            <p style="text-align: center;">Regime Categories Across the World</p>',
+    position = "topright"
+  )
+
+# adding in polygons for each country in map display
+bm <- bm %>%
+  addPolygons(
+    fillColor = ~colpal(regime_category),
+    weight = 2,
+    opacity = 1,
+    color = "white",
+    dashArray = "3",
+    fillOpacity = 0.7,
+    highlight = highlightOptions(
+      weight = 5,
+      color = "grey",
+      dashArray = "",
+      fillOpacity = 0.7,
+      bringToFront = TRUE
+    ),
+    label = ~paste(name, "<br>","Regime:", regime_category,"<br>","Year:", year),
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "15px",
+      direction = "auto"
+    )
+  )
+
+bm
+saveWidget(bm, file="my_map.html")
+```
+
+
+### If you want to add the legend back in..
+```{r}
+# legend was taken out because I thought it was distracting and mad the map more laggy
+
+# now for a legend!
+
+bm <- bm %>%
+  addLegend(
+    pal = colpal,
+    values = ~regime_category,
+    opacity = 0.7,
+    title = "Regime Category",
+    position = "bottomright")
+```
+
+

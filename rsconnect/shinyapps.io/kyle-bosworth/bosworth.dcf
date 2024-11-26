@@ -1,0 +1,10 @@
+name: bosworth
+title:
+username: kyle-bosworth
+account: kyle-bosworth
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13319921
+bundleId: 9353899
+url: https://kyle-bosworth.shinyapps.io/bosworth/
+version: 1

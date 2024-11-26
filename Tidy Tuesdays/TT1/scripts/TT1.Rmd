@@ -1,0 +1,125 @@
+---
+title: "Tidy Tuesday 1"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(gganimate)
+library(gifski)
+library(transformr)
+```
+
+### Read in data: Monster Movies
+```{r}
+monster_movie_genres <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-10-29/monster_movie_genres.csv')
+monster_movies <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-10-29/monster_movies.csv')
+
+glimpse(monster_movies)
+```
+
+
+
+### Goal/skill that I have not done yet: Adding animation to my plots
+
+Which year had the highest rated horror movie?
+Data clean up
+- Use subset movie, year, average rating
+- top movie of each year then arrange in terms of top 10 highest rated moview overall
+-Letʻs try to display these movies to pop up in ascending years (past to present) based on their rating
+
+#### Data cleanup: filter and remove NAs
+```{r}
+Horror_movies <- monster_movies %>%
+  filter(str_detect(genres, "Horror")) %>% #detecting string patter in this case (genres, Horror)
+  select(original_title, year, average_rating) %>% #from the horror genres we only want the original title, year, and average rating
+  filter(!is.na(average_rating) & !is.na(year)) # we want to get rid of all NAs in the year and average rating columns
+
+head(Horror_movies) #chk
+```
+
+#### Data cleanup: top 10 arrange 1-10
+```{r}
+top10_by_year <- Horror_movies %>% 
+  group_by(year) %>% #top rated movie for each year
+  slice_max(average_rating, n=1) %>%
+  ungroup()
+
+top10 <- top10_by_year %>% #top rated movie overall
+  slice_max(average_rating, n=10) %>%
+  arrange(desc(average_rating))
+```
+
+#### Make a plot
+```{r}
+ggplot(top10,
+       aes(x = reorder(original_title, average_rating), #reorder(titles by rating)
+           y = average_rating,
+           fill = as.factor(year))) + #use as.factor for discrete colors
+  geom_col() +
+  geom_text(aes(label = paste(original_title, " (", year, ")", sep = "")), 
+            hjust = 1, nudge_y = -0.1, color = "white") +
+  coord_flip() +
+  scale_fill_viridis_d() +
+  labs(title = "Top10 Highest Rated Horror Movies",
+       x = NULL,
+       y = "Average Rating",
+       fill = "Year") +
+  theme_minimal() +
+   theme(legend.position = "none",
+        panel.grid.major.y = element_blank(),
+        axis.text.y = element_blank())
+```
+#### Addmy animation to the plot
+```{r}
+animated_plot <- ggplot(top10, aes(x = reorder(original_title, average_rating), y = average_rating, fill = as.factor(year))) +
+  geom_col() +
+  geom_text(aes(label = paste(original_title, " (", year, ")", sep = "")), #Use paste() to combine two variables into one lable, formatted: ʻmovie title(year)ʻ
+            hjust = 1, 
+            nudge_y = -0.1, 
+            color = "white") + 
+  coord_flip() +
+  scale_fill_viridis_d() +
+  labs(title = "Top 10 Highest-Rated Horror Movies",
+       subtitle = "Year: {frame_along}",  #add dynamic subtitle ov year progression
+       x = NULL,
+       y = "Average Rating",
+       fill = "Year") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid.major.y = element_blank(),
+        axis.text.y = element_blank()) +
+  transition_reveal(year)  #animates the plot by fading-in scale bars by year
+
+```
+
+#### Display GIF and save
+
+```{r create-and-display-gif, echo=FALSE, fig.cap="Top 10 Highest-Rated Horror Movies"}
+anim_save("./outputs/top_10_horror_movies.gif", animated_plot)
+
+gif_path <- here::here("Tidy Tuesdays", "TT1", "outputs", "top_10_horror_movies.gif")
+anim_save(gif_path, animated_plot)
+knitr::include_graphics(gif_path)
+```
