@@ -1,0 +1,164 @@
+---
+title: "Tidy Tuesday 1"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(shiny)
+
+```
+
+### Read in data: 
+```{r}
+
+
+glimpse()
+View()
+```
+
+### Intro to Shiny Apps
+
+What is Shiny and why use it?
+Basics of user interface
+Basics of the server
+Reactive objects
+Resources for Shiny Themes, dashboard, publishing your app
+
+### When is Shiny useful?
+When we want to make R code accessible outside of an R or RStudio environment. For example,
+
+teaching a package
+
+showing data visualizations to non-experts
+
+- great bridge for Data/statistics and data visualization without the code. 
+
+streamlining certain code-intensive things (like database queries or visualizing bulky simulation outputs)
+
+### Examples
+- Teaching population growth models
+-     Population Dynamics Lab
+
+- Visualize model projections
+- Marine Mammal Bycatch model
+Siple et al. (2022) Journal of Open Source Software
+
+To have fun
+
+### Starting a new Shiny app
+Note: your Shiny app needs to be in its own folder and the foldername is the name of the app. It is really best for it to be its own standalone repo, but for today create your own folder in your lastname repo
+
+Install shiny: if you have the most recent RStudio it should already be installed
+
+
+#### ui - user interface, this is the appearance app/website
+- The ui (user interface) object dictates the appearance of the app. UI functions write HTML. For something to appear in your app, it needs to be in the UI.
+
+#### server has your r code, the back end
+- The server() function contains rendering expressions that create the objects to display.
+
+The server function and UI object are passed to the shinyApp() function to create a Shiny app object.
+
+#### SAVING
+- When saving the script in your app, create a folder with the name of your app and then save the script as 'app.R'. You MUST save the script with this name for it to work. Also, all files associated with your app must be in this folder.
+
+### Test shiny app exxample, super basic
+```{r}
+library(shiny)
+ui<-fluidPage('Hello World')
+server<-function(input,output){}
+shinyApp(ui = ui, server = server)
+```
+
+### Start an app in RStudio
+From The RStudio IDE, pick New File -> Shiny Web App
+
+- You can choose between single (app.R) or multiple files (ui.R and server.R)
+
+- Does it matter which one you choose?
+
+Not really. Some people like the organization of having multiple files. But it really doesn't make a difference!
+
+This has a lot of helpful start code, but we are going to start from scratch today
+
+
+
+### Inputs/Outputs
+
+The app itself is built around inputs and outputs.
+- input: what is x, y , color?
+- output: completed figure/knit file
+
+### Create an input with a *Input function
+There are many types of inputs and the syntax for all of them is typeInput. To make a slider we use sliderInput().
+
+These inputs make a bunch of html code behind the scene.
+
+```{r}
+sliderInput(inputId = "num", # ID name for the input
+            label = "Choose a number", # Label above the input
+            value = 25, min = 1, max = 100 # values for the slider
+            )
+```
+
+Creates this code behind the scenes:
+```{r}
+<div class="form-group shiny-input-container">
+<label class="control-label" for="num">Choose a number</label>
+<input class="js-range-slider" id="num" data-min="1" data-max="100"
+data-from="25" data-step="1" data-grid="true" data-grid-num="9.9"
+data-grid-snap="false" data-prettify-separator="," data-keyboard="true"
+data-keyboard-step="1.01010101010101"/>
+</div>
+```
+
+### See ClassApp app.R
+library(shiny)
+
+ui<- fluidPage(
+  sliderInput(inputId = "num", # ID name for the input
+              label = "Choose a number", #Label above the input
+              value = 25, min = 1, max = 100 # values for the slider
+              )
+)
+
+server<- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+
+
+sliderInput(inputId (inputname) = "num, label = "choose a number)
+
+
+
+### so many shiny widget options for inputs
+https://shiny.posit.co/r/gallery/widgets/widget-gallery/
+inputs and output codes to use
+
+even more: https://dreamrs.github.io/shinyWidgets/
+
+
+
+
+
