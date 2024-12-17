@@ -1,0 +1,126 @@
+---
+title: "Week 13 Class notes for loop"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+```
+
+### Read in Data
+```{r}
+TP1 <- read.csv(here("week13", "data", "homework", "TP1.csv"))
+TP2 <- read.csv(here("week13", "data", "homework", "TP2.csv"))
+TP3 <- read.csv(here("week13", "data", "homework", "TP3.csv"))
+TP4 <- read.csv(here("week13", "data", "homework", "TP4.csv"))
+
+```
+#### List to store the results (mean and Standard Deviation)
+```{r}
+
+TP_data <- list(TP1, TP2, TP3, TP4)
+
+```
+
+### Calculate Mean and Standard Deviation using ForLoop
+```{r}
+
+# bring in my list
+loop_results <- list()
+
+
+for (i in seq_along(TP_data)) {
+df <- TP_data[[i]]  
+
+
+# calculate the mean and sd for temp and intensity
+mean_temp <- mean(df$Temp.C, na.rm = TRUE)
+sd_temp <- sd(df$Temp.C, na.rm = TRUE)
+mean_intensity <- mean(df$Intensity.lux, na.rm = TRUE)
+sd_intensity <- sd(df$Intensity.lux, na.rm = TRUE)
+
+# taking out calculation results and store them  into their own dataframe
+resultsdf <- data.frame(
+  File = paste0("TP, i"),
+  Metric = c("Mean Temp.C", "SD Temp.C", "Mean Intensity.lux", "SD Intensity.lux"),
+  Value = c(mean_temp, sd_temp, mean_intensity, sd_intensity))
+
+# append the results to the list
+loop_results[[i]] <- resultsdf
+
+}
+
+# no we need to comnbine our results into a single df
+ALL_loop_results <- do.call(rbind, loop_results)
+
+
+```
+
+### Calculate Mean and Standard Deviation using Map()
+```{r}
+# i need to define my finction in roder to calculate the mean and SD
+
+calculate_stats <- function(df) {
+  mean_temp <- mean(df$Temp.C, na.rm = TRUE)
+  sd_temp <- sd(df$Temp.C, na.rm = TRUE)
+  mean_intensity <- mean(df$Intensity.lux, na.rm = TRUE)
+  sd_intensity <- sd(df$Intensity.lux, na.rm = TRUE)
+  
+  data.frame(
+    File = deparse(substitute (df)),
+    Metric = c("Mean Temp.C", "SD Temp.c", "Mean Intensity.lux", "SD Intensity.lux"),
+    Value = c(mean_temp, sd_temp, mean_intensity, sd_intensity))
+}
+
+# now we can this time use map() and apply the function to each dataframe
+
+map_results <- map(TP_data, calculate_stats)
+
+# then combined the results into a single df again
+
+ALL_map_results <- do.call(rbind, map_results)
+
+
+```
+
+
+### Rresults Table
+```{r}
+# ForLoop:
+print("Results using ForLoop:")
+print(ALL_loop_results)
+
+#map()
+print("results using map()")
+print(ALL_map_results)
+
+
+#export table
+
+write.csv(ALL_loop_results, file = here("week13", "outputs", "ALL_loop_results"))
+write.csv(ALL_map_results, file = here ("week13", "outputs", "ALL_map_results"))
+
+```
+
+
+

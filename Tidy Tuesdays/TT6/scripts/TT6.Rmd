@@ -1,0 +1,94 @@
+---
+title: "Tidy Tuesday 6"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(corrplot)
+```
+
+### Read in Data
+```{r}
+global_holidays <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-12-24/global_holidays.csv')
+monthly_passengers <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-12-24/monthly_passengers.csv')
+
+```
+
+Goal: To use the corrplot package to create a correlation plot between the two data sets: global holidays and monthly passengers
+
+### Preping the data
+```{r}
+# bc these data sets are very large, I will be only using the first 100 rows, a subset for each.
+
+global_holidays %>%
+  select(ISO3, Date, Type) %>% # selecting for variables
+  filter(Type == "Public") %>%
+  slice(1:100) # slicing for the 1st 100 rows
+
+monthly_passengers %>%
+  select(ISO3, Year, Month, Total, Domestic, International) %>%
+  slice(1:100)
+
+
+# view the structure of the data sets before merging, we will merge by ISO3
+str(global_holidays)
+str(monthly_passengers)
+
+# merging the datasets together
+mergedata <- monthly_passengers %>%
+  inner_join(global_holidays, by = "ISO3")
+```
+
+### Now letʻs calculate the correlation matrix for the merged data sets
+```{r}
+corr_matrix <- mergedata %>%
+  select(Total, Domestic, International) %>% #We have selected only the numerical vales within the mergeds set
+  cor(use = "pairwise.complete.obs") #calculating correlation matrix
+
+```
+
+### Letʻs create a correlation plot!
+```{r}
+
+# method - determines how correlations are displayed (circle, square, color, number, shade, pie)
+# type - controls which part of the matrix to display (upper, lower, and full)
+# tl.col - color text of lables
+# tl.srt - rotates the text lables
+# addCoef.col - adds numeriucal correlation values in a specific color
+# number.cex - controls the size of correlation coeficients
+
+corrplot(corr_matrix, method = "circle", 
+         type = "upper",
+         tl.col = "black",
+         tl.srt = 45,
+         addCoef.col = "black",      # adding in correlation coefficients
+         number.cex = 0.7,           #dictates the size of the numbers
+         title = "Correlation Between Passenger Types",
+         mar = c(0,0,2,0),           #margin adjustments for the title
+         cl.ratio = 0.2,             #color legend size ratio
+         tl.pos = "lt")              #text label positioning 
+
+```
+
+

@@ -1,0 +1,82 @@
+---
+title: "Tidy Tuesday 5"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(dygraphs) #for creating interactive time series plots
+library(xts) # for handling time series data
+```
+
+### Read in Data
+```{r}
+parfumo_data_clean <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-12-10/parfumo_data_clean.csv')
+
+head(parfumo_data_clean)
+```
+
+Goal: Iʻd like to use the dygraphs packages and create an interactive time series plot based on the purfume rating over the years. 
+
+### Data Prep
+
+```{r}
+P_timeseries <- parfumo_data_clean %>%
+  filter(!is.na(Release_Year)) %>% # Had to filter NAs
+  group_by(Release_Year) %>% 
+  summarise(Average_Rating = mean(Rating_Value, na.rm = TRUE)) %>% #Calculate average rating and removes NAs
+  ungroup()
+
+
+if(any(is.na(P_timeseries$Release_Year))){
+  stop("There are NA values in Release_Year") # Make sure there is no NAs
+}
+
+```
+
+
+### XTS object
+```{r}
+
+# Now we need to convert the summarized data into an xts object for time series plotting
+P_xts <- xts(P_timeseries$Average_Rating,
+             order.by = as.Date(paste0(P_timeseries$Release_Year,"-01-01")))
+
+```
+xts - eXtensible Time Series package is designed to handle time series data. We convert our data to xts class because it allows us to index our data by time, crucial for any time series analysis. This way we can manipulate and analzy data based on its time component. For example you could filter for specific time intervals. 
+
+Syntax: P_xts <- xts("data", order.by)
+
+### Creating the interactive time series plot using dygraphs package!
+```{r}
+# The dygraph is a function that initializes a object using a specified time series data, in this case the P_xts dataframe. 
+
+dygraph(P_xts, main = "Average Perfume Rating Over Year") %>% # main sets the title
+  dyAxis("y", label = "Average Rating") %>% # title of y axis
+  dyOptions(fillGraph = TRUE, drawGrid = TRUE) %>% # dyOptions sets the global options for the plot, FillGraph = true - fills the underline of the graph, creating the area chart. drawGrid = True enables the on the graph. 
+  dyRangeSelector() # allows you to zoom in and interact with the plot 
+
+```
+
+
+

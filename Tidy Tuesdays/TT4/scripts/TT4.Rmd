@@ -1,0 +1,110 @@
+---
+title: "Tidy Tuesday 4"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(plotly)
+library(dplyr)
+library(ggbiplot) # specific package for PCA visualization
+
+```
+
+### Read in Data from TidyTuesday GitHub
+```{r}
+episode_metrics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-11-19/episode_metrics.csv')
+
+```
+
+Goal: Create a PCA Plot
+I have wanted to learn how to create a PCA plot for this tidy tuesday I will be using the Bobs Burgers Data set. I thought that this would be a cool dataset to try this out on because of the type of values (numerical) are in each category of this data set. 
+
+### Prepare the data
+```{r}
+
+
+# Filter data so that we only include the seasons 1-3 first, using all seasons because too much too look at all at once
+episode_metrics_filtered <- episode_metrics %>%
+  filter(season %in% c(1, 2, 3))
+
+# select the variables for PCA
+pcadata <- episode_metrics_filtered %>%
+  select(dialogue_density, unique_words, exclamation_ratio) %>%
+  na.omit() %>%
+  scale() # scale() standardizes the variable to have a mean = 0 and sd = 1, important for PCA
+
+  
+```
+
+### Preform PCA
+```{r}
+# using the scaled data, preform PCA using prcomp
+PCAresults <- prcomp(pcadata, scale. = TRUE)
+
+# calculate the proportion of variance explained by each individal Principal Component (PC)
+var_explained <- PCAresults$sdev^2 / sum(PCAresults$sdev^2) * 100
+
+```
+
+### Creating the PCA biplot using ggbiplot
+```{r}
+
+PCAplot <- ggbiplot(PCAresults, 
+                    obs.scale = 1, #scales
+                    var.scale = 1,
+                    groups = factor(episode_metrics_filtered$season), #colorby filtered seasons
+                    ellipse = TRUE, # this adds confidence eclipses
+                    circle = FALSE) + #removed confidence circles to simplify the plot
+  xlim(-4, 4) +  # these dictate the x-axis limits
+  ylim(-4, 6) +  # y-axis limits
+  scale_color_manual(name = "Season",
+                    values = c("orange", "lightblue", "forestgreen"),
+                    labels = c("Season 1", "Season 2", "Season 3")) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    legend.justification = c(1, 1),
+    legend.box.background = element_rect(color = "gray", fill = "white", size = 0.5),
+    legend.margin = margin(6, 6, 6, 6),
+    panel.grid.major = element_line(color = "gray"),
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(size = 14, hjust = 0.5, face = "bold"),
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 10)
+  ) +
+  labs(
+    title = "PCA of Bob's Burgers Episodes (Seasons 1-3)",
+    x = sprintf("PC1 (%.1f%% explained var.)", var_explained[1]), #adds titles to inform variance trends
+    y = sprintf("PC2 (%.1f%% explained var.)", var_explained[2])
+  )
+print(PCAplot)
+```
+
+
+
+PC1 - 42.1% of the variance - represent the direction of maximum variation in this simplified data set (Seasons 1-3). It shows the strongest pattern in how dialog density, unique words, and exclamation ratio vary together across episodes/seasons.
+
+PC2 - 35.6% of the variance - represents the second most significant pattern of variation, uncorrelated to PC1. 
+
+Both PC1 and PC2 explain 77.7% of the dataset. We can notice that The show has been evolving in terms of script depth. We can see that the dialog density and unique words point in the same direction (positive correlation) and increase from season 1 to season 3. 

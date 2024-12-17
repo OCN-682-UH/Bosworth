@@ -1,0 +1,36 @@
+title: "Shiny Apps HW: Bogfoot Sightings"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(shiny)
+library(shinythemes)
+library(leaflet)
+```
+
+### Read in data: 
+```{r}
+bigfootdf <- read.csv(here("ShinyAppHW", "data", "bigfoot.csv"))
+
+```

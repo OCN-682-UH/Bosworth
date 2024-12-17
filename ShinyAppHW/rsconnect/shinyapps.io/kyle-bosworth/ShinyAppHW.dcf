@@ -1,0 +1,12 @@
+name: ShinyAppHW
+title: ShinyAppHW
+username: kyle-bosworth
+account: kyle-bosworth
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13608791
+bundleId: 9531055
+url: https://kyle-bosworth.shinyapps.io/ShinyAppHW/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

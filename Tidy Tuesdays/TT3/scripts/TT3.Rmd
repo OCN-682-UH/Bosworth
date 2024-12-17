@@ -1,0 +1,76 @@
+---
+title: "Tidy Tuesday 3"
+author: "Kyle Bosworth"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../outputs/")
+knitr::opts_chunk$set(dev = "png", 
+                      fig.path = "../outputs/",
+                      fig.width = 7,
+                      fig.height = 5)
+```
+
+### Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(plotly)
+library(dplyr)
+```
+
+
+### Read in Data
+```{r}
+cbp_state <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-11-26/cbp_state.csv')
+
+```
+
+## Goal: I would like to learn how to make an Area chart using the Plotly package
+
+### Prepare Data
+```{r}
+# Prepare the data (example: aggregate by fiscal_year, state, citizenship, and demographic)
+cbp_state_aggregated <- cbp_state %>%
+  dplyr::group_by(fiscal_year, state, citizenship, demographic) %>%
+  dplyr::summarise(encounter_count = sum(encounter_count))
+
+# Filter the data to show only a few selected states
+selected_states <- c("AK")
+cbp_state_filtered <- cbp_state_aggregated %>%
+  dplyr::filter(state %in% selected_states)
+
+```
+
+### Create an Area chart
+```{r}
+plot_ly(cbp_state_filtered, x = ~fiscal_year, y = ~encounter_count, 
+        type = 'scatter', mode = 'lines+fill', fill = 'tozeroy', 
+        color = ~interaction(state, citizenship, demographic)) %>%
+  layout(
+    title = "Encounter Counts by Northern Border Region States, Citizenship, and Demographic Over Time",
+    xaxis = list(title = "Fiscal Year", ticklen = 5, tickcolor = "black"),
+    yaxis = list(title = "Encounter Count", ticklen = 5, tickcolor = "black"),
+    legend = list(
+      orientation = "v", # Vertical orientation
+      x = 1.05, # Move legend to the right
+      y = 0.5, # Center the legend vertically
+      yanchor = "middle",
+      xanchor = "left",
+      font = list(size = 10) # Adjust font size
+    ),
+    margin = list(l = 100, r = 150, b = 100, t = 100), # Adjust margins for better spacing
+    hovermode = "x unified" # Unified hover mode for better interaction
+  )
+```
+

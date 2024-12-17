@@ -1,5 +1,5 @@
 ---
-title: "Tidy Tuesday 1"
+title: "Shiny Apps"
 author: "Kyle Bosworth"
 date: "`r Sys.Date()`"
 output:
@@ -31,8 +31,6 @@ library(shiny)
 
 ### Read in data: 
 ```{r}
-
-
 glimpse()
 View()
 ```
